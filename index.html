@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WAR GAME</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.23.0/dist/css/uikit.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.23.0/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.23.0/dist/js/uikit-icons.min.js"></script>
+    <style>
+        body {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .title-bar {
+            font-size: 1.2rem;
+        }
+
+        .score-display {
+            font-size: 1rem;
+        }
+
+        #question {
+            font-size: 0.9rem;
+        }
+
+        .uk-button {
+            padding: 14px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Title bar -->
+    <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom title-bar">
+        <div class="uk-text-bold">WAR GAME</div>
+        <div id="score" class="score-display">Score: 0</div>
+    </div>
+
+    <!-- Question -->
+    <p id="question" class="uk-margin-small-top uk-margin-small-bottom">
+        Which player has the highest WAR?
+    </p>
+
+    <!-- Answer buttons -->
+    <div>
+        <button id="choice-0" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom">Joe Blow</button>
+        <button id="choice-1" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom">Max
+            Strong</button>
+        <button id="choice-2" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom">Luis
+            Power</button>
+        <button id="choice-3" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom">Pete
+            Speed</button>
+    </div>
+
+    <!-- Feedback with a modal -->
+    <div id="result-modal" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-animation-slide-bottom-small" style="margin-top: 400px;">
+            <h2 id="result-title" class="uk-modal-title"></h2>
+            <p id="result-detail"></p>
+            <p class="uk-text-right">
+                <button class="uk-button uk-button-primary uk-modal-close" type="button">Next</button>
+            </p>
+        </div>
+    </div>
+
+
+</body>
+
+<script>
+    let currentPlayers = [];
+    let correctIndex = null;
+    let count = 0;
+    let score = 0;
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function generateRound() {
+        const allPlayers = players();
+        shuffle(allPlayers);
+
+        currentPlayers = allPlayers.slice(0, 4);
+        correctIndex = currentPlayers.reduce((best, player, i, arr) =>
+            player.war > arr[best].war ? i : best, 0
+        );
+
+        for (let i = 0; i < 4; i++) {
+            const btn = document.getElementById(`choice-${i}`);
+            if (btn) btn.textContent = currentPlayers[i].name;
+        }
+    }
+
+    function handleChoice(index) {
+        count++;
+        updateScore();
+        const modal = UIkit.modal('#result-modal');
+        const titleEl = document.getElementById('result-title');
+        const detailEl = document.getElementById('result-detail');
+        const correctPlayer = currentPlayers[correctIndex];
+
+        if (index === correctIndex) {
+            titleEl.textContent = "Correct!";
+            detailEl.textContent = `Yes, ${correctPlayer.name} has the top WAR (${correctPlayer.war})`;
+            score++;
+            updateScore();
+        } else {
+            titleEl.textContent = "Nope.";
+            detailEl.textContent = `${correctPlayer.name} has the top WAR (${correctPlayer.war})`;
+        }
+
+        // Show WARs for all players
+        for (let i = 0; i < 4; i++) {
+            const btn = document.getElementById(`choice-${i}`);
+            const player = currentPlayers[i];
+            btn.textContent = `${player.name} (${player.war})`;
+        }
+
+        modal.show();
+    }
+
+    function updateScore() {
+        const scoreEl = document.getElementById('score');
+        scoreEl.textContent = `Score: ${score} / ${count}`;
+    }
+
+    for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`choice-${i}`);
+        btn.addEventListener('click', () => handleChoice(i));
+    }
+
+    UIkit.util.on('#result-modal', 'hidden', generateRound);
+
+    updateScore(0)
+    generateRound();
+
+
+    function players() {
+        return [
+            { name: 'Aaron Judge', war: 7.1 },
+            { name: 'Cal Raleigh', war: 6 },
+            { name: 'Pete Crow-Armstrong', war: 5.1 },
+            { name: 'Tarik Skubal', war: 4.7 },
+            { name: 'Bobby Witt Jr.', war: 4.7 },
+            { name: 'Shohei Ohtani', war: 4.5 },
+            { name: 'Jeremy Peña', war: 4 },
+            { name: 'Paul Skenes', war: 3.9 },
+            { name: 'James Wood', war: 3.9 },
+            { name: 'Kyle Tucker', war: 3.9 },
+            { name: 'Fernando Tatis Jr.', war: 3.8 },
+            { name: 'Zack Wheeler', war: 3.8 },
+            { name: 'Garrett Crochet', war: 3.8 },
+            { name: 'Trea Turner', war: 3.7 },
+            { name: 'Corbin Carroll', war: 3.7 },
+            { name: 'Logan Webb', war: 3.6 },
+            { name: 'José Ramírez', war: 3.6 },
+            { name: 'Francisco Lindor', war: 3.6 },
+            { name: 'Will Smith', war: 3.5 },
+            { name: 'Byron Buxton', war: 3.4 },
+            { name: 'Ketel Marte', war: 3.3 },
+            { name: 'Ceddanne Rafaela', war: 3.1 },
+            { name: 'MacKenzie Gore', war: 3.1 },
+            { name: 'Kris Bubic', war: 3.1 },
+            { name: 'Elly De La Cruz', war: 3.1 },
+            { name: 'Jesús Luzardo', war: 3.1 },
+            { name: 'Geraldo Perdomo', war: 3.1 },
+            { name: 'Alejandro Kirk', war: 3 },
+            { name: 'Manny Machado', war: 3 },
+            { name: 'Cristopher Sánchez', war: 3 },
+            { name: 'CJ Abrams', war: 2.9 },
+            { name: 'Pete Alonso', war: 2.9 },
+            { name: 'Zach McKinstry', war: 2.9 },
+            { name: 'Matt Olson', war: 2.9 },
+            { name: 'Andy Pages', war: 2.9 },
+            { name: 'Max Fried', war: 2.9 },
+            { name: 'Jacob Wilson', war: 2.9 },
+            { name: 'Carlos Narváez', war: 2.9 },
+            { name: 'Hunter Brown', war: 2.9 },
+            { name: 'Sonny Gray', war: 2.8 },
+            { name: 'Kyle Schwarber', war: 2.8 },
+            { name: 'Nathan Eovaldi', war: 2.8 },
+            { name: 'Riley Greene', war: 2.8 },
+            { name: 'Juan Soto', war: 2.8 },
+            { name: 'Isaac Paredes', war: 2.7 },
+            { name: 'Michael Busch', war: 2.7 },
+            { name: 'Masyn Winn', war: 2.7 },
+            { name: 'Framber Valdez', war: 2.7 },
+            { name: 'Jacob deGrom', war: 2.6 },
+            { name: 'Cody Bellinger', war: 2.6 },
+            { name: 'Maikel Garcia', war: 2.6 },
+            { name: 'Jake Meyers', war: 2.5 },
+            { name: 'Brendan Donovan', war: 2.5 },
+            { name: 'Chris Sale', war: 2.5 },
+            { name: 'Matt Chapman', war: 2.5 },
+            { name: 'Jazz Chisholm Jr.', war: 2.5 },
+            { name: 'Eugenio Suárez', war: 2.5 },
+            { name: 'Nick Pivetta', war: 2.5 },
+            { name: 'Randy Arozarena', war: 2.4 },
+            { name: 'Joe Ryan', war: 2.4 },
+            { name: 'Corey Seager', war: 2.4 },
+            { name: 'Mitch Keller', war: 2.4 },
+            { name: 'Alex Bregman', war: 2.4 },
+            { name: 'Gunnar Henderson', war: 2.4 },
+            { name: 'Matthew Boyd', war: 2.4 },
+            { name: 'José Soriano', war: 2.4 },
+            { name: 'Nico Hoerner', war: 2.3 },
+            { name: 'Bryan Woo', war: 2.3 },
+            { name: 'Sal Frelick', war: 2.3 },
+            { name: 'J.P. Crawford', war: 2.3 },
+            { name: 'Spencer Schwellenbach', war: 2.3 },
+            { name: 'Seiya Suzuki', war: 2.3 },
+            { name: 'Austin Wells', war: 2.3 },
+            { name: 'Gleyber Torres', war: 2.2 },
+            { name: 'Max Muncy', war: 2.2 },
+            { name: 'Yoshinobu Yamamoto', war: 2.2 },
+            { name: 'Ernie Clement', war: 2.2 },
+            { name: 'Jonathan Aranda', war: 2.2 },
+            { name: 'Steven Kwan', war: 2.2 },
+            { name: "Ryan O'Hearn", war: 2.2 },
+            { name: 'Julio Rodríguez', war: 2.2 },
+            { name: 'Ranger Suárez', war: 2.2 },
+            { name: 'Andrew Abbott', war: 2.1 },
+            { name: 'Ronald Acuña Jr.', war: 2.1 },
+            { name: 'Kyle Stowers', war: 2.1 },
+            { name: 'Lawrence Butler', war: 2.1 },
+            { name: 'Brandon Nimmo', war: 2.1 },
+            { name: 'Addison Barger', war: 2.1 },
+            { name: 'David Peterson', war: 2.1 },
+            { name: 'Xander Bogaerts', war: 2.1 },
+            { name: 'Junior Caminero', war: 2.1 },
+            { name: 'Freddie Freeman', war: 2.1 },
+            { name: 'Matthew Liberatore', war: 2.1 },
+            { name: 'Carson Kelly', war: 2.1 },
+            { name: 'TJ Friedl', war: 2.1 },
+            { name: 'Drake Baldwin', war: 2 },
+            { name: 'Vladimir Guerrero Jr.', war: 2 },
+            { name: 'Wilyer Abreu', war: 2 },
+            { name: 'Josh Smith', war: 2 },
+            { name: 'George Springer', war: 2 },
+            { name: 'Freddy Peralta', war: 2 },
+            { name: 'Merrill Kelly', war: 2 },
+            { name: 'Dansby Swanson', war: 2 },
+            { name: 'Chad Patrick', war: 2 },
+            { name: 'Willson Contreras', war: 2 },
+            { name: 'Hunter Goodman', war: 2 },
+            { name: 'Rafael Devers', war: 2 },
+            { name: 'Brice Turang', war: 1.9 },
+            { name: 'Gabriel Moreno', war: 1.9 },
+            { name: 'Yusei Kikuchi', war: 1.9 },
+            { name: 'Jackson Chourio', war: 1.9 },
+            { name: 'Austin Riley', war: 1.9 },
+            { name: 'Dillon Dingler', war: 1.9 },
+            { name: 'Trent Grisham', war: 1.9 },
+            { name: 'Will Warren', war: 1.9 },
+            { name: 'Spencer Torkelson', war: 1.9 },
+            { name: 'Isaac Collins', war: 1.9 },
+            { name: 'Mauricio Dubón', war: 1.8 },
+            { name: 'Cam Smith', war: 1.8 },
+            { name: 'William Contreras', war: 1.8 },
+            { name: 'Taylor Ward', war: 1.8 },
+            { name: 'Robbie Ray', war: 1.8 },
+            { name: 'Harrison Bader', war: 1.8 },
+            { name: 'Sean Murphy', war: 1.8 },
+            { name: 'Carlos Rodón', war: 1.8 },
+            { name: 'Dylan Cease', war: 1.8 },
+            { name: 'Bo Bichette', war: 1.8 },
+            { name: 'Wyatt Langford', war: 1.8 },
+            { name: 'Brent Rooker', war: 1.8 },
+            { name: 'Otto Lopez', war: 1.8 },
+            { name: 'Zach Neto', war: 1.7 },
+            { name: 'Chris Bassitt', war: 1.7 },
+            { name: 'Marcus Semien', war: 1.7 },
+            { name: 'Tyler Mahle', war: 1.7 },
+            { name: 'Kyle Freeland', war: 1.7 },
+            { name: 'Michael Wacha', war: 1.7 },
+            { name: 'Robert Suarez', war: 1.7 },
+            { name: 'Aroldis Chapman', war: 1.7 },
+            { name: 'Kodai Senga', war: 1.7 },
+            { name: 'Kevin Gausman', war: 1.6 },
+            { name: 'Cole Ragans', war: 1.6 },
+            { name: 'Colt Keith', war: 1.6 },
+            { name: 'Ramón Laureano', war: 1.6 },
+            { name: 'Javier Báez', war: 1.6 },
+            { name: 'Pablo López', war: 1.6 },
+            { name: 'Randy Rodríguez', war: 1.6 },
+            { name: 'Willy Adames', war: 1.6 },
+            { name: 'Patrick Bailey', war: 1.6 },
+            { name: 'Iván Herrera', war: 1.6 },
+            { name: 'Adrian Houser', war: 1.6 },
+            { name: 'Nick Lodolo', war: 1.6 },
+            { name: 'José Berríos', war: 1.6 },
+            { name: 'Yandy Díaz', war: 1.6 },
+            { name: 'Mookie Betts', war: 1.5 },
+            { name: 'Drew Rasmussen', war: 1.5 },
+            { name: 'Hunter Greene', war: 1.5 },
+            { name: 'Oneil Cruz', war: 1.5 },
+            { name: 'Jake Cronenworth', war: 1.5 },
+            { name: 'Alec Bohm', war: 1.5 },
+            { name: 'Tyler Heineman', war: 1.5 },
+            { name: 'Victor Scott II', war: 1.5 },
+            { name: 'Jarren Duran', war: 1.5 },
+            { name: 'Josh Naylor', war: 1.5 },
+            { name: 'Nick Martinez', war: 1.5 },
+            { name: 'Tylor Megill', war: 1.5 },
+            { name: 'Jung Hoo Lee', war: 1.5 },
+            { name: 'Heliot Ramos', war: 1.4 },
+            { name: 'Janson Junk', war: 1.4 },
+            { name: 'Michael King', war: 1.4 },
+            { name: 'Brandon Lowe', war: 1.4 },
+            { name: 'Adrian Morejon', war: 1.4 },
+            { name: 'Jeff McNeil', war: 1.4 },
+            { name: 'Bryan Abreu', war: 1.4 },
+            { name: 'Bryce Harper', war: 1.4 },
+            { name: 'Nick Allen', war: 1.4 },
+            { name: 'Tommy Edman', war: 1.4 },
+            { name: 'Brady Singer', war: 1.4 },
+            { name: 'Hoby Milner', war: 1.4 },
+            { name: 'Luis Castillo', war: 1.3 },
+            { name: 'Jo Adell', war: 1.3 },
+            { name: 'Griffin Jax', war: 1.3 },
+            { name: 'Taj Bradley', war: 1.3 },
+            { name: 'Dean Kremer', war: 1.3 },
+            { name: 'Casey Mize', war: 1.3 },
+            { name: 'Trevor Story', war: 1.3 },
+            { name: 'Tyler Soderstrom', war: 1.3 },
+            { name: 'Lucas Giolito', war: 1.3 },
+            { name: 'Ryan Pepiot', war: 1.3 },
+            { name: 'Paul Goldschmidt', war: 1.3 },
+            { name: 'Ben Rice', war: 1.3 },
+            { name: 'Gavin Sheets', war: 1.3 },
+            { name: 'Reese Olson', war: 1.2 },
+            { name: 'Clarke Schmidt', war: 1.2 },
+            { name: 'Will Vest', war: 1.2 },
+            { name: 'Caleb Durbin', war: 1.2 },
+            { name: 'Shane Smith', war: 1.2 },
+            { name: 'Andrés Muñoz', war: 1.2 },
+            { name: 'Mike Yastrzemski', war: 1.2 },
+            { name: 'Christian Yelich', war: 1.2 },
+            { name: 'Jordan Westburg', war: 1.2 },
+            { name: 'Cade Smith', war: 1.2 },
+            { name: 'Willi Castro', war: 1.2 },
+            { name: 'Jack Dreyer', war: 1.2 },
+            { name: 'Jake Mangum', war: 1.2 },
+            { name: 'Jose Altuve', war: 1.2 },
+            { name: 'Evan Carter', war: 1.2 },
+            { name: 'Romy Gonzalez', war: 1.2 },
+            { name: 'Lars Nootbaar', war: 1.2 },
+            { name: 'Luis Severino', war: 1.2 },
+            { name: 'Edwin Díaz', war: 1.2 },
+            { name: 'Jackson Merrill', war: 1.2 },
+            { name: 'Trevor Williams', war: 1.2 },
+            { name: 'Jhoan Duran', war: 1.2 },
+            { name: 'Logan Gilbert', war: 1.1 },
+            { name: 'Nolan Arenado', war: 1.1 },
+            { name: 'Chris Paddack', war: 1.1 },
+            { name: 'Pete Fairbanks', war: 1.1 },
+            { name: 'Germán Márquez', war: 1.1 },
+            { name: 'Bryson Stott', war: 1.1 },
+            { name: 'Ryan Jeffers', war: 1.1 },
+            { name: 'Nolan Schanuel', war: 1.1 },
+            { name: 'Denzel Clarke', war: 1.1 },
+            { name: 'Jasson Domínguez', war: 1.1 },
+            { name: 'Xavier Edwards', war: 1.1 },
+            { name: 'Rhys Hoskins', war: 1.1 },
+            { name: 'Jackson Holliday', war: 1.1 },
+            { name: 'Phil Maton', war: 1.1 },
+            { name: "Ke'Bryan Hayes", war: 1.1 },
+            { name: 'Max Schuemann', war: 1.1 },
+            { name: 'Alec Burleson', war: 1 },
+            { name: 'Jose Trevino', war: 1 },
+            { name: 'Ryne Nelson', war: 1 },
+            { name: 'Ben Casparius', war: 1 },
+            { name: 'Josh Hader', war: 1 },
+            { name: 'Seth Lugo', war: 1 },
+            { name: 'Dane Myers', war: 1 },
+            { name: 'Steven Matz', war: 1 },
+            { name: 'Bennett Sousa', war: 1 },
+            { name: 'Andrés Giménez', war: 1 },
+            { name: 'Brett Baty', war: 1 },
+            { name: 'Edward Cabrera', war: 1 },
+            { name: 'Ryan Gusto', war: 1 },
+            { name: 'J.T. Realmuto', war: 1 },
+            { name: 'Jason Adam', war: 1 },
+            { name: 'Daniel Schneemann', war: 1 },
+            { name: 'Hyeseong Kim', war: 1 },
+            { name: 'Mike Tauchman', war: 1 },
+            { name: 'Abner Uribe', war: 1 },
+            { name: 'Mitchell Parker', war: 1 },
+            { name: 'Nathan Lukes', war: 1 },
+            { name: 'Pavin Smith', war: 1 },
+            { name: 'Dennis Santana', war: 1 },
+            { name: 'Emmanuel Clase', war: 1 },
+            { name: 'José Caballero', war: 1 },
+            { name: 'Adley Rutschman', war: 1 },
+            { name: 'David Bednar', war: 1 },
+            { name: 'Jorge Polanco', war: 1 },
+            { name: 'Jake Bird', war: 1 },
+            { name: 'Steven Okert', war: 1 },
+            { name: 'Ben Brown', war: 1 },
+            { name: 'Trevor Megill', war: 1 },
+            { name: 'Gabe Speier', war: 1 },
+            { name: 'Noah Cameron', war: 0.9 },
+            { name: 'Shane Baz', war: 0.9 },
+            { name: 'Brendon Little', war: 0.9 },
+            { name: 'Josh Lowe', war: 0.9 },
+            { name: 'Lourdes Gurriel Jr.', war: 0.9 },
+            { name: 'Nick Mears', war: 0.9 },
+            { name: 'Jack Flaherty', war: 0.9 },
+            { name: 'Louis Varland', war: 0.9 },
+            { name: 'Shea Langeliers', war: 0.9 },
+            { name: 'Landen Roupp', war: 0.9 },
+            { name: 'Spencer Strider', war: 0.9 },
+            { name: 'Danny Coulombe', war: 0.9 },
+            { name: 'Patrick Corbin', war: 0.9 },
+            { name: 'Sean Newcomb', war: 0.9 },
+            { name: 'Griffin Canning', war: 0.9 },
+            { name: 'Clay Holmes', war: 0.9 },
+            { name: 'Kody Clemens', war: 0.9 },
+            { name: 'Wenceel Pérez', war: 0.9 },
+            { name: 'Michael Soroka', war: 0.9 },
+            { name: 'Carlos Correa', war: 0.9 },
+            { name: 'Nick Kurtz', war: 0.9 },
+            { name: 'Hunter Dobbins', war: 0.9 },
+            { name: 'Miguel Amaya', war: 0.9 },
+            { name: 'Liam Hicks', war: 0.9 },
+            { name: 'Luis L. Ortiz', war: 0.9 },
+            { name: 'Eric Lauer', war: 0.9 },
+            { name: 'Garrett Whitlock', war: 0.9 },
+            { name: 'Fernando Cruz', war: 0.8 },
+            { name: 'Chase Meidroth', war: 0.8 },
+            { name: 'Kyle Hendricks', war: 0.8 },
+            { name: 'Gabriel Arias', war: 0.8 },
+            { name: 'Dustin May', war: 0.8 },
+            { name: 'Ian Happ', war: 0.8 },
+            { name: 'Simeon Woods Richardson', war: 0.8 },
+            { name: 'Alex Call', war: 0.8 },
+            { name: 'Matt McLain', war: 0.8 },
+            { name: 'Austin Hays', war: 0.8 },
+            { name: 'Anthony Volpe', war: 0.8 },
+            { name: 'Trevor Rogers', war: 0.8 },
+            { name: 'José Alvarado', war: 0.8 },
+            { name: 'Ryan McMahon', war: 0.8 },
+            { name: 'Jordan Beck', war: 0.8 },
+            { name: 'Caleb Thielbar', war: 0.8 },
+            { name: 'Marcell Ozuna', war: 0.8 },
+            { name: 'Bryan King', war: 0.8 },
+            { name: 'Matt Strahm', war: 0.8 },
+            { name: 'Devin Williams', war: 0.8 },
+            { name: 'Jeremiah Estrada', war: 0.8 },
+            { name: 'Mason Miller', war: 0.8 },
+            { name: 'Kerry Carpenter', war: 0.8 },
+            { name: 'Mike Trout', war: 0.8 },
+            { name: 'Cal Quantrill', war: 0.8 },
+            { name: 'Luis Torrens', war: 0.8 },
+            { name: 'Cade Povich', war: 0.8 },
+            { name: 'Bo Naylor', war: 0.8 },
+            { name: 'George Kirby', war: 0.8 },
+            { name: 'Jack Leiter', war: 0.8 },
+            { name: 'Carlos Santana', war: 0.8 },
+            { name: 'Brad Lord', war: 0.8 },
+            { name: 'Grant Holmes', war: 0.8 },
+            { name: 'Michael Lorenzen', war: 0.8 },
+            { name: 'Tyler Alexander', war: 0.8 },
+            { name: 'Davis Martin', war: 0.7 },
+            { name: 'Matt Thaiss', war: 0.7 },
+            { name: 'Cedric Mullins', war: 0.7 },
+            { name: 'Edmundo Sosa', war: 0.7 },
+            { name: 'Braydon Fisher', war: 0.7 },
+            { name: 'Eury Pérez', war: 0.7 },
+            { name: 'Tyler Rogers', war: 0.7 },
+            { name: 'Mark Leiter Jr.', war: 0.7 },
+            { name: 'Vinnie Pasquantino', war: 0.7 },
+            { name: 'Heriberto Hernandez', war: 0.7 },
+            { name: 'Brandon Marsh', war: 0.7 },
+            { name: 'Logan Allen', war: 0.7 },
+            { name: 'Reid Detmers', war: 0.7 },
+            { name: 'Graham Ashcraft', war: 0.7 },
+            { name: 'Rob Refsnyder', war: 0.7 },
+            { name: 'Daniel Palencia', war: 0.7 },
+            { name: 'Roman Anthony', war: 0.7 },
+            { name: 'Caleb Ferguson', war: 0.7 },
+            { name: 'Kyle Finnegan', war: 0.7 },
+            { name: 'Justin Wilson', war: 0.7 },
+            { name: 'Brock Stewart', war: 0.7 },
+            { name: 'Jose A. Ferrer', war: 0.7 },
+            { name: 'Miles Mikolas', war: 0.7 },
+            { name: 'Corbin Burnes', war: 0.7 },
+            { name: 'Justin Verlander', war: 0.7 },
+            { name: 'Jeffrey Springs', war: 0.7 },
+            { name: 'Brayan Bello', war: 0.7 },
+            { name: 'Mickey Moniak', war: 0.7 },
+            { name: 'Nick Gonzales', war: 0.7 },
+            { name: 'Ramón Urías', war: 0.7 },
+            { name: 'Clayton Kershaw', war: 0.7 },
+            { name: 'Eduardo Rodriguez', war: 0.7 },
+            { name: 'Jesús Sánchez', war: 0.7 },
+            { name: 'Stephen Kolek', war: 0.7 },
+            { name: 'Tanner Banks', war: 0.7 },
+            { name: 'Myles Straw', war: 0.7 },
+            { name: 'Tyler Freeman', war: 0.7 },
+            { name: 'Logan Henderson', war: 0.6 },
+            { name: 'Jose Quintana', war: 0.6 },
+            { name: 'Dominic Canzone', war: 0.6 },
+            { name: 'Austin Wynns', war: 0.6 },
+            { name: 'Alek Thomas', war: 0.6 },
+            { name: 'Manuel Rodríguez', war: 0.6 },
+            { name: 'Tanner Scott', war: 0.6 },
+            { name: 'JP Sears', war: 0.6 },
+            { name: 'Nick Fortes', war: 0.6 },
+            { name: 'Jordan Hicks', war: 0.6 },
+            { name: 'James McCann', war: 0.6 },
+            { name: 'Lucas Erceg', war: 0.6 },
+            { name: 'Reese McGuire', war: 0.6 },
+            { name: 'Tanner Bibee', war: 0.6 },
+            { name: 'Félix Bautista', war: 0.6 },
+            { name: 'Daulton Varsho', war: 0.6 },
+            { name: 'Jacob Latz', war: 0.6 },
+            { name: 'Miguel Vargas', war: 0.6 },
+            { name: 'Taijuan Walker', war: 0.6 },
+            { name: 'J.C. Escarra', war: 0.6 },
+            { name: 'Yoán Moncada', war: 0.6 },
+            { name: 'Carlos Estévez', war: 0.6 },
+            { name: 'Grant Taylor', war: 0.6 },
+            { name: 'Josh Jung', war: 0.6 },
+            { name: 'Reed Garrett', war: 0.6 },
+            { name: 'Tyler Anderson', war: 0.6 },
+            { name: 'Charlie Morton', war: 0.6 },
+            { name: 'Jacob Lopez', war: 0.6 },
+            { name: 'Ronel Blanco', war: 0.6 },
+            { name: 'Chris Martin', war: 0.6 },
+            { name: 'Brad Keller', war: 0.6 },
+            { name: 'David Festa', war: 0.6 },
+            { name: 'Lenyn Sosa', war: 0.6 },
+            { name: 'Shelby Miller', war: 0.6 },
+            { name: 'Danny Jansen', war: 0.6 },
+            { name: 'Ben Williamson', war: 0.6 },
+            { name: 'Tyler Stephenson', war: 0.6 },
+            { name: 'Freddy Fermin', war: 0.6 },
+            { name: 'Noelvi Marte', war: 0.6 },
+            { name: 'Drew Pomeranz', war: 0.6 },
+            { name: 'Brandon Walter', war: 0.6 },
+            { name: 'Zebby Matthews', war: 0.6 },
+            { name: 'Andrew Heaney', war: 0.5 },
+            { name: 'Zack Littell', war: 0.5 },
+            { name: 'Davis Schneider', war: 0.5 },
+            { name: 'Colton Gordon', war: 0.5 },
+            { name: 'Quinn Priester', war: 0.5 },
+            { name: 'Justin Wrobleski', war: 0.5 },
+            { name: 'Cole Sands', war: 0.5 },
+            { name: 'Robert Garcia', war: 0.5 },
+            { name: 'Casey Schmitt', war: 0.5 },
+            { name: 'Leo Rivas', war: 0.5 },
+            { name: 'Orion Kerkering', war: 0.5 },
+            { name: 'Justin Topa', war: 0.5 },
+            { name: 'Alex Vesia', war: 0.5 },
+            { name: 'AJ Smith-Shawver', war: 0.5 },
+            { name: 'Jahmai Jones', war: 0.5 },
+            { name: 'Colton Cowser', war: 0.5 },
+            { name: 'Luke Raley', war: 0.5 },
+            { name: 'José Buttó', war: 0.5 },
+            { name: 'Pierce Johnson', war: 0.5 },
+            { name: 'Max Meyer', war: 0.5 },
+            { name: 'Gavin Williams', war: 0.5 },
+            { name: 'Victor Caratini', war: 0.5 },
+            { name: 'Valente Bellozo', war: 0.5 },
+            { name: 'Gregory Soto', war: 0.5 },
+            { name: 'Michael McGreevy', war: 0.5 },
+            { name: 'Michael A. Taylor', war: 0.5 },
+            { name: 'Kyle Teel', war: 0.5 },
+            { name: 'Brenan Hanifee', war: 0.5 },
+            { name: 'Jonathan Cannon', war: 0.5 },
+            { name: 'Garrett Mitchell', war: 0.5 },
+            { name: 'Marcelo Mayer', war: 0.5 },
+            { name: 'Seranthony Domínguez', war: 0.5 },
+            { name: 'Bailey Falter', war: 0.5 },
+            { name: 'Austin Hedges', war: 0.5 },
+            { name: 'Spencer Steer', war: 0.5 },
+            { name: 'Sandy Alcantara', war: 0.5 },
+            { name: 'Aaron Bummer', war: 0.5 },
+            { name: 'Justin Slaten', war: 0.5 },
+            { name: 'Adolis García', war: 0.5 },
+            { name: 'Shota Imanaga', war: 0.5 },
+            { name: 'Ronny Henriquez', war: 0.5 },
+            { name: 'Jared Koenig', war: 0.5 },
+            { name: 'Emmet Sheehan', war: 0.5 },
+            { name: 'Eli White', war: 0.5 },
+            { name: 'Kameron Misner', war: 0.5 },
+            { name: 'Francisco Alvarez', war: 0.4 },
+            { name: 'Luis Urías', war: 0.4 },
+            { name: 'Isiah Kiner-Falefa', war: 0.4 },
+            { name: 'Ty France', war: 0.4 },
+            { name: 'Luke Keaschall', war: 0.4 },
+            { name: 'Derek Hill', war: 0.4 },
+            { name: 'Joe Boyle', war: 0.4 },
+            { name: 'Kyle Isbel', war: 0.4 },
+            { name: 'Shawn Armstrong', war: 0.4 },
+            { name: 'Jonny DeLuca', war: 0.4 },
+            { name: 'Jacob Young', war: 0.4 },
+            { name: 'Curtis Mead', war: 0.4 },
+            { name: 'Kyren Paris', war: 0.4 },
+            { name: 'Teoscar Hernández', war: 0.4 },
+            { name: 'Agustín Ramírez', war: 0.4 },
+            { name: 'Brant Hurter', war: 0.4 },
+            { name: 'Starling Marte', war: 0.4 },
+            { name: 'Slade Cecconi', war: 0.4 },
+            { name: 'Emilio Pagán', war: 0.4 },
+            { name: 'Yohel Pozo', war: 0.4 },
+            { name: 'Steven Cruz', war: 0.4 },
+            { name: 'Eric Orze', war: 0.4 },
+            { name: 'Bryce Miller', war: 0.4 },
+            { name: 'Jake Rogers', war: 0.4 },
+            { name: 'Cade Horton', war: 0.4 },
+            { name: 'Colin Rea', war: 0.4 },
+            { name: 'Andrew McCutchen', war: 0.4 },
+            { name: 'Lake Bachar', war: 0.4 },
+            { name: 'Ryan Walker', war: 0.4 },
+            { name: 'Dylan Lee', war: 0.4 },
+            { name: 'Joey Ortiz', war: 0.4 },
+            { name: 'Ryan Feltner', war: 0.4 },
+            { name: 'Mike Burrows', war: 0.4 },
+            { name: 'Ryan Brasier', war: 0.4 },
+            { name: 'Pedro Pagés', war: 0.4 },
+            { name: 'Enyel De Los Santos', war: 0.4 },
+            { name: 'Ozzie Albies', war: 0.4 },
+            { name: 'Tyler Fitzgerald', war: 0.4 },
+            { name: 'Andre Pallante', war: 0.4 },
+            { name: 'Ryan Bergert', war: 0.4 },
+            { name: 'Bailey Ober', war: 0.4 },
+            { name: 'Wandy Peralta', war: 0.4 },
+            { name: 'Jacob Misiorowski', war: 0.4 },
+            { name: 'Rafael Montero', war: 0.3 },
+            { name: 'Chandler Simpson', war: 0.3 },
+            { name: 'Matt Wallner', war: 0.3 },
+            { name: 'Martín Pérez', war: 0.3 },
+            { name: 'Kolby Allard', war: 0.3 },
+            { name: 'Max Kepler', war: 0.3 },
+            { name: 'Johan Rojas', war: 0.3 },
+            { name: 'Jimmy Herget', war: 0.3 },
+            { name: 'Dalton Rushing', war: 0.3 }
+        ];
+    }
+
+
+</script>
+
+</html>
