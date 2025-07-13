@@ -257,7 +257,7 @@
       updateTimerDisplay(seconds);
 
       if (seconds <= 0) {
-        clearInterval(interval);
+        clearInterval(timerID);
         gameOver();
       }
     }, 1000);
