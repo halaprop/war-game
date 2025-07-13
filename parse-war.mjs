@@ -15,10 +15,11 @@ const rl = readline.createInterface({
 rl.on('line', line => {
   const parts = line.split(',');
   const name = parts[1]?.trim();
+  const team = parts[2]?.trim();
   const war = parseFloat(parts[parts.length - 1]);
 
   if (name && !isNaN(war)) {
-    results.push({ name, war });
+    results.push({ name, team, war });
   }
 });
 
