@@ -76,12 +76,10 @@
 
   <!-- Feedback modal -->
   <div id="result-modal" uk-modal>
-    <div class="uk-modal-dialog uk-modal-body uk-animation-slide-bottom-small" style="margin-top: 400px;">
+    <div class="uk-modal-dialog uk-modal-body uk-animation-slide-bottom-small uk-text-center" style="margin-top: 440px;">
       <h2 id="result-title" class="uk-modal-title"></h2>
       <p id="result-detail"></p>
-      <p class="uk-text-right">
-        <button class="uk-button uk-button-primary uk-modal-close" type="button">Next</button>
-      </p>
+      <button class="uk-button uk-button-primary uk-modal-close uk-width-1-1" type="button">Next</button>
     </div>
   </div>
 
@@ -141,12 +139,12 @@
     const correctPlayer = currentPlayers[correctIndex];
 
     if (index === correctIndex) {
-      titleEl.textContent = "Correct!";
+      titleEl.textContent = "Correct";
       detailEl.textContent = `Yes, ${correctPlayer.name} has the top WAR (${correctPlayer.war})`;
       score++;
       updateScore();
     } else {
-      titleEl.textContent = "Nope.";
+      titleEl.textContent = "Nope";
       detailEl.textContent = `${correctPlayer.name} has the top WAR (${correctPlayer.war})`;
     }
 
