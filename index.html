@@ -243,7 +243,7 @@
   });
 
 
-  function startCountdown(seconds = 20) {
+  function startCountdown(seconds = 60) {
     function updateTimerDisplay(sec) {
       const mins = Math.floor(sec / 60).toString().padStart(2, '0');
       const secs = (sec % 60).toString().padStart(2, '0');
