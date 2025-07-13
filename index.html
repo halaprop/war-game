@@ -70,7 +70,7 @@
 
     <!-- Menu -->
     <div id="offcanvas-nav" uk-offcanvas="overlay: true">
-      <div class="uk-offcanvas-bar uk-background-primary uk-light">
+      <div class="uk-offcanvas-bar uk-light" style="background-color: slategray;">
         <ul class="uk-nav">
           <li class="uk-active"><a id="timed-game" style="font-size: large;" href="#">Play a Timed Game</a></li>
           <li class="uk-active"><a id="reset-game" style="font-size: large;" href="#">Reset</a></li>
@@ -94,10 +94,10 @@
     <!-- result modal -->
     <div id="result-modal" hidden
       style="position: fixed; inset: 0; background: transparent; z-index: 999; display: flex; justify-content: center; align-items: flex-end; padding: calc(env(safe-area-inset-bottom) + 60px) 12px 20px;">
-      <div class="uk-card uk-card-default uk-card-body uk-text-center uk-animation-slide-bottom-small"
-        style="width: 100%; max-width: 380px;">
-        <h2 id="result-title" class="uk-modal-title"></h2>
-        <p id="result-detail"></p>
+      <div class="uk-card uk-card-default uk-text-center uk-animation-slide-bottom-small"
+        style="width: 100%; max-width: 380px; padding: 12px 16px; font-size: 0.85rem; line-height: 1.2;">
+        <h2 id="result-title" class="uk-modal-title" style="margin-bottom: 8px; font-size: 1.1rem;"></h2>
+        <p id="result-detail" style="margin-bottom: 12px;"></p>
         <button class="uk-button uk-button-primary uk-width-1-1" type="button" onclick="hideResultModal()">Next</button>
       </div>
     </div>
@@ -122,7 +122,7 @@
       <div class="uk-modal-dialog uk-modal-body uk-text-center">
         <h3 class="uk-modal-title">About</h3>
         <p class="uk-text-small uk-text-muted">Justin thought of this</p>
-        <button class="uk-button uk-button-secondary uk-width-1-1"
+        <button class="uk-button uk-button-primary uk-width-1-1"
           onclick="UIkit.modal('#about-modal').hide()">OK</button>
       </div>
     </div>
