@@ -9,10 +9,35 @@
   <script src="https://cdn.jsdelivr.net/npm/uikit@3.23.0/dist/js/uikit.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/uikit@3.23.0/dist/js/uikit-icons.min.js"></script>
   <style>
+    :root {
+      --bg-tan: #fdf6e3;
+      --green: #2e7d32;
+      --green-bright: #43a047;
+    }
+
+    html {
+      background-color: var(--bg-tan);
+      height: 100%;
+    }
+
     body {
+      background-color: var(--bg-tan);
+      min-height: 100vh;
       max-width: 480px;
       margin: 0 auto;
       padding: 0px;
+    }
+
+    .uk-button-default {
+      border-color: #5d5d5d !important;
+      /* warm dark gray */
+      color: #333 !important;
+    }
+
+    .uk-button-primary {
+      background-color: var(--bg-tan) !important;
+      border-color: var(--green) !important;
+      color: black !important;
     }
 
     .app-container {
@@ -24,6 +49,17 @@
 
     .title-bar {
       font-size: 1.2rem;
+      position: relative;
+    }
+
+    .center-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .game-time {
+      margin-top: -4px;
     }
 
     .score-display {
@@ -40,10 +76,45 @@
     }
 
     .choice-selected {
-      background-color: slategray !important;
-      /* UIKit primary blue */
+      background-color: var(--green) !important;
       color: white !important;
-      border-color: slategray !important;
+      border-color: var(--green) !important;
+    }
+
+    .menu-background {
+      background-color: var(--green-bright);
+    }
+
+    .menu-item-large {
+      font-size: large;
+    }
+
+    .result-modal-container {
+      position: fixed;
+      inset: 0;
+      background: transparent;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding: calc(env(safe-area-inset-bottom) + 60px) 12px 20px;
+    }
+
+    .result-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      line-height: 1.2;
+    }
+
+    .result-title {
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    .result-detail {
+      margin-bottom: 12px;
     }
   </style>
 </head>
@@ -51,30 +122,26 @@
 <body>
 
   <!-- Title bar -->
-  <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom title-bar uk-background-muted"
-    style="position: relative;">
-    <!-- Left: hamburger -->
+  <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom title-bar uk-background-muted">
     <a class="uk-navbar-toggle uk-margin-left" uk-navbar-toggle-icon href="#offcanvas-nav" uk-toggle></a>
 
-    <!-- Center: WAR GAME (absolutely centered) -->
-    <div class="uk-text-center" style="position: absolute; left: 50%; transform: translateX(-50%);">
+    <div class="uk-text-center center-title">
       <div class="uk-text-bold">WAR GAME</div>
-      <div id="game-time" class="uk-text-small uk-text-muted" style="margin-top: -4px;">00:00</div>
+      <div id="game-time" class="uk-text-small uk-text-muted game-time">00:00</div>
     </div>
 
-    <!-- Right: score -->
-    <div id="score" class="score-display  uk-margin-right">Score: 0</div>
+    <div id="score" class="score-display uk-margin-right">Score: 0</div>
   </div>
 
   <div class="app-container">
 
     <!-- Menu -->
     <div id="offcanvas-nav" uk-offcanvas="overlay: true">
-      <div class="uk-offcanvas-bar uk-light" style="background-color: slategray;">
+      <div class="uk-offcanvas-bar uk-light menu-background">
         <ul class="uk-nav">
-          <li class="uk-active"><a id="timed-game" style="font-size: large;" href="#">Play a Timed Game</a></li>
-          <li class="uk-active"><a id="reset-game" style="font-size: large;" href="#">Reset</a></li>
-          <li class="uk-active"><a id="about" style="font-size: large;" href="#">About</a></li>
+          <li class="uk-active"><a id="timed-game" class="menu-item-large" href="#">Play a Timed Game</a></li>
+          <li class="uk-active"><a id="reset-game" class="menu-item-large" href="#">Reset</a></li>
+          <li class="uk-active"><a id="about" class="menu-item-large" href="#">About</a></li>
         </ul>
       </div>
     </div>
@@ -91,17 +158,16 @@
       <button id="choice-3" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom"></button>
     </div>
 
-    <!-- result modal -->
-    <div id="result-modal" hidden
-      style="position: fixed; inset: 0; background: transparent; z-index: 999; display: flex; justify-content: center; align-items: flex-end; padding: calc(env(safe-area-inset-bottom) + 60px) 12px 20px;">
-      <div class="uk-card uk-card-default uk-text-center uk-animation-slide-bottom-small"
-        style="width: 100%; max-width: 380px; padding: 12px 16px; font-size: 0.85rem; line-height: 1.2;">
-        <h2 id="result-title" class="uk-modal-title" style="margin-bottom: 8px; font-size: 1.1rem;"></h2>
-        <p id="result-detail" style="margin-bottom: 12px;"></p>
+    <!-- Result modal -->
+    <div id="result-modal" hidden class="result-modal-container">
+      <div class="uk-card uk-card-default uk-text-center uk-animation-slide-bottom-small result-card">
+        <h2 id="result-title" class="uk-modal-title result-title"></h2>
+        <p id="result-detail" class="result-detail"></p>
         <button class="uk-button uk-button-primary uk-width-1-1" type="button" onclick="hideResultModal()">Next</button>
       </div>
     </div>
 
+    <!-- Ready modal -->
     <div id="ready-modal" uk-modal>
       <div class="uk-modal-dialog uk-modal-body uk-text-center">
         <h2 class="uk-modal-title">Ready?</h2>
@@ -109,6 +175,7 @@
       </div>
     </div>
 
+    <!-- Score modal -->
     <div id="score-modal" uk-modal>
       <div class="uk-modal-dialog uk-modal-body uk-text-center">
         <h2 class="uk-modal-title">Game Over</h2>
@@ -118,6 +185,7 @@
       </div>
     </div>
 
+    <!-- About modal -->
     <div id="about-modal" uk-modal>
       <div class="uk-modal-dialog uk-modal-body uk-text-center">
         <h3 class="uk-modal-title">About</h3>
@@ -126,6 +194,7 @@
           onclick="UIkit.modal('#about-modal').hide()">OK</button>
       </div>
     </div>
+  </div>
   </div> <!-- app-container -->
 </body>
 
@@ -186,7 +255,7 @@
       conj = 'all have';
     }
     const correctPhrase = `${namePhrase} ${conj} the top WAR (${bestWAR.toFixed(1)})`;
-    
+
     if (currentPlayers[index].war === bestWAR) {
       titleEl.textContent = "Correct";
       detailEl.textContent = `Yes, ${correctPhrase}`;
@@ -266,7 +335,7 @@
   });
 
 
-  function startCountdown(seconds = 60) {
+  function startCountdown(seconds = 5) {
     function updateTimerDisplay(sec) {
       const mins = Math.floor(sec / 60).toString().padStart(2, '0');
       const secs = (sec % 60).toString().padStart(2, '0');
@@ -291,6 +360,8 @@
     const scoreEl = document.getElementById('score');
     document.getElementById('final-score').textContent = `${scoreEl.textContent}`;
     UIkit.modal('#score-modal').show();
+    reset();
+    hideResultModal();
   }
 
   reset();
