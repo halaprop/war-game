@@ -131,7 +131,7 @@
 
 <script>
   let currentPlayers = [];
-  let correctIndex = null;
+  let bestWAR = null;
   let count = 0;
   let score = 0;
   let timerID;
@@ -143,14 +143,21 @@
     }
   }
 
-  function generateRound() {
+  function generateRound(maxWarDelta = 1.5) {
     const allPlayers = players();
     shuffle(allPlayers);
 
-    currentPlayers = allPlayers.slice(0, 4);
-    correctIndex = currentPlayers.reduce((best, player, i, arr) =>
-      player.war > arr[best].war ? i : best, 0
-    );
+    const firstPlayer = allPlayers[0];
+    currentPlayers = [firstPlayer];
+    for (let index = 1; currentPlayers.length < 4; index++) {
+      const player = allPlayers[index];
+      const warDelta = Math.abs(player.war - firstPlayer.war);
+      if (warDelta <= maxWarDelta) {
+        currentPlayers.push(player);
+      }
+    }
+
+    bestWAR = Math.max(...currentPlayers.map(p => p.war));
 
     for (let i = 0; i < 4; i++) {
       const btn = document.getElementById(`choice-${i}`);
@@ -163,16 +170,31 @@
     updateScore();
     const titleEl = document.getElementById('result-title');
     const detailEl = document.getElementById('result-detail');
-    const correctPlayer = currentPlayers[correctIndex];
 
-    if (index === correctIndex) {
+    const correctPlayers = currentPlayers.filter(p => p.war === bestWAR);
+    const correctPlayerNames = correctPlayers.map(p => p.name);
+
+    let namePhrase, conj;
+    if (correctPlayerNames.length === 1) {
+      namePhrase = correctPlayerNames[0];
+      conj = 'has';
+    } else if (correctPlayerNames.length === 2) {
+      namePhrase = `${correctPlayerNames[0]} and ${correctPlayerNames[1]}`;
+      conj = 'both have';
+    } else {
+      namePhrase = `${correctPlayerNames.slice(0, -1).join(', ')}, and ${correctPlayerNames.slice(-1)}`;
+      conj = 'all have';
+    }
+    const correctPhrase = `${namePhrase} ${conj} the top WAR (${bestWAR.toFixed(1)})`;
+    
+    if (currentPlayers[index].war === bestWAR) {
       titleEl.textContent = "Correct";
-      detailEl.textContent = `Yes, ${correctPlayer.name} has the top WAR (${correctPlayer.war})`;
+      detailEl.textContent = `Yes, ${correctPhrase}`;
       score++;
       updateScore();
     } else {
       titleEl.textContent = "Nope";
-      detailEl.textContent = `${correctPlayer.name} has the top WAR (${correctPlayer.war})`;
+      detailEl.textContent = correctPhrase;
     }
 
     // Show WARs for all players
