@@ -11,8 +11,9 @@
   <style>
     :root {
       --bg-tan: #fdf6e3;
-      --green: #2e7d32;
-      --green-bright: #43a047;
+      --dark-tan: #6d5838;
+      --green: #67763e;
+      --green-bright: #2e7d32;
     }
 
     html {
@@ -122,8 +123,8 @@
 <body>
 
   <!-- Title bar -->
-  <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom title-bar uk-background-muted">
-    <a class="uk-navbar-toggle uk-margin-left" uk-navbar-toggle-icon href="#offcanvas-nav" uk-toggle></a>
+  <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom title-bar" style="color: white; background-color: var(--dark-tan);">
+    <a class="uk-navbar-toggle uk-margin-left" uk-navbar-toggle-icon href="#offcanvas-nav" uk-toggle style="color: white;"></a>
 
     <div class="uk-text-center center-title">
       <div class="uk-text-bold">WAR GAME</div>
@@ -190,7 +191,8 @@
       <div class="uk-modal-dialog uk-modal-body uk-text-center">
         <h3 class="uk-modal-title">About</h3>
         <p>
-          Justin came up with this. <strong>WAR</strong> stands for <span class="uk-text-italic">Wins Above Replacement</span> — a stat every baseball nerd must know. Do you?
+          Justin came up with this. <strong>WAR</strong> stands for <span class="uk-text-italic">Wins Above
+            Replacement</span> — a stat every baseball nerd must know. Do you?
         </p>
         <button class="uk-button uk-button-primary uk-width-1-1"
           onclick="UIkit.modal('#about-modal').hide()">OK</button>
@@ -371,6 +373,25 @@
   generateRound();
 
   function players() {
+    const pos = [
+      "C",   // Catcher
+      "1B",  // First Base
+      "2B",  // Second Base
+      "3B",  // Third Base
+      "SS",  // Shortstop
+      "LF",  // Left Field
+      "CF",  // Center Field
+      "RF",  // Right Field
+      "OF",  // Outfield (general, used for aggregated stats)
+      "DH",  // Designated Hitter
+      "P",   // Pitcher
+      "SP",  // Starting Pitcher
+      "RP",  // Relief Pitcher
+      "2-W", // Two-way player (rare, used for players like Shohei Ohtani)
+      "UT",  // Utility (general use, not always official)
+    ]
+    const randomPosition = () => pos[Math.floor(Math.random() * pos.length)];
+    
     return [
       { name: 'Aaron Judge', team: 'NYY', war: 7.1 },
       { name: 'Cal Raleigh', team: 'SEA', war: 6 },
@@ -872,7 +893,7 @@
       { name: 'Johan Rojas', team: 'PHI', war: 0.3 },
       { name: 'Jimmy Herget', team: 'COL', war: 0.3 },
       { name: 'Dalton Rushing', team: 'LAD', war: 0.3 }
-    ];
+    ].map(p => ({ ...p, position: randomPosition() }));
   }
 
 
