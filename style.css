@@ -1,0 +1,108 @@
+:root {
+    --bg-tan: #fdf6e3;
+    --dark-tan: #6d5838;
+    --green: #67763e;
+    --green-bright: #2e7d32;
+}
+
+html {
+    background-color: var(--bg-tan);
+    height: 100%;
+}
+
+body {
+    background-color: var(--bg-tan);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0px;
+}
+
+.uk-button-default {
+    border-color: #5d5d5d !important;
+    /* warm dark gray */
+    color: #333 !important;
+}
+
+.uk-button-primary {
+    background-color: var(--bg-tan) !important;
+    border-color: var(--green) !important;
+    color: black !important;
+}
+
+.app-container {
+    padding-left: 12px;
+    padding-right: 12px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.title-bar {
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.center-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.game-time {
+    margin-top: -4px;
+}
+
+.score-display {
+    font-size: 1rem;
+}
+
+#question {
+    font-size: 0.9rem;
+}
+
+.uk-button {
+    padding: 14px;
+    font-size: 1rem;
+}
+
+.choice-selected {
+    background-color: var(--green) !important;
+    color: white !important;
+    border-color: var(--green) !important;
+}
+
+.menu-background {
+    background-color: var(--green-bright);
+}
+
+.menu-item-large {
+    font-size: large;
+}
+
+.result-modal-container {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: calc(env(safe-area-inset-bottom) + 60px) 12px 20px;
+}
+
+.result-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+.result-title {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.result-detail {
+    margin-bottom: 12px;
+}
