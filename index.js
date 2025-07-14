@@ -146,7 +146,8 @@ class WarGame {
   }
 
   showResult({ correct, phrase, index }) {
-    this.resultTitle.textContent = correct ? "Correct" : "Nope";
+    const title = correct ? "Correct" : "Nope";
+    this.resultTitle.innerHTML = `<strong>${title}</strong>`;
     this.resultDetail.textContent = correct ? `Yes, ${phrase}` : phrase;
 
     this.updateScore();
