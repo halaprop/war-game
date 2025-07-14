@@ -1,3 +1,4 @@
+.DS_Store
 .vscode/
 parse-war.mjs
 war-data.csv
