@@ -167,7 +167,7 @@ class WarGame {
     }, 10); // wait for offcanvas to finish closing
   }
 
-  startTimedGame(seconds = 5) {
+  startTimedGame(seconds = 60) {
     this.readyModal.hide();
     this.startRound();
     this.timerDiv.hidden = false;
