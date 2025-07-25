@@ -1,12 +1,30 @@
 
 export class PlayerDB {
 
-  static filteredPlayers(selectedTeams = [], selectedPositions = []) {
-    return this.players().filter(player => {
+  static filteredPlayers(selectedTeams = [], selectedPositions = [], shuffled = true) {
+    const result = this.players().filter(player => {
       const matchTeam = selectedTeams.length === 0 || selectedTeams.includes(player.team);
       const matchPos = selectedPositions.length === 0 || selectedPositions.includes(player.pos);
       return matchTeam && matchPos;
     });
+    if (shuffled) this.shuffle(result);
+    return result;
+  }
+
+  static meanStdDev(players, stat) {
+    const values = players.map(player => player[stat]);
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+    const stdDev = Math.sqrt(
+      values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length
+    );
+    return { mean, stdDev };
+  }
+
+  static shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
   }
 
   static teams() {
