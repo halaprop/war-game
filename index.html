@@ -30,15 +30,67 @@
   <div class="app-container">
 
     <!-- Menu -->
-    <div id="offcanvas-nav" uk-offcanvas="overlay: true">
-      <div class="uk-offcanvas-bar uk-light menu-background">
-        <ul class="uk-nav">
-          <li class="uk-active"><a id="timed-game" class="menu-item-large" href="#">Play a Timed Game</a></li>
-          <li class="uk-active"><a id="reset-game" class="menu-item-large" href="#">Reset</a></li>
-          <li class="uk-active"><a id="about" class="menu-item-large" href="#">About</a></li>
-        </ul>
-      </div>
-    </div>
+<div id="offcanvas-nav" uk-offcanvas="overlay: true">
+  <div class="uk-offcanvas-bar uk-light menu-background">
+
+    <ul class="uk-nav uk-nav-default">
+
+      <!-- Game Menu Items -->
+      <li class="uk-active">
+        <a id="timed-game" class="menu-item-large" href="#">Play a Timed Game</a>
+      </li>
+      <li class="uk-active">
+        <a id="reset-game" class="menu-item-large" href="#">Reset</a>
+      </li>
+      <li class="uk-active">
+        <a id="about" class="menu-item-large" href="#">About</a>
+      </li>
+
+      <li class="uk-nav-divider"></li>
+
+      <!-- Filter: Stats -->
+      <li>
+        <div>
+          <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-small-top">
+            <label class="uk-margin-remove">
+              <input class="uk-checkbox filter-group" type="checkbox" data-target="stats"> Stats
+            </label>
+            <a href="#" class="toggle-sublist" aria-label="Toggle section">+</a>
+          </div>
+          <ul id="stats-menu" class="uk-nav-sub uk-list uk-margin-small-left" hidden></ul>
+        </div>
+      </li>
+
+      <!-- Filter: Positions -->
+      <li>
+        <div>
+          <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-small-top">
+            <label class="uk-margin-remove">
+              <input class="uk-checkbox filter-group" type="checkbox" data-target="positions"> Positions
+            </label>
+            <a href="#" class="toggle-sublist" aria-label="Toggle section">+</a>
+          </div>
+          <ul id="positions-menu" class="uk-nav-sub uk-list uk-margin-small-left" hidden></ul>
+        </div>
+      </li>
+
+      <!-- Filter: Teams -->
+      <li>
+        <div>
+          <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-small-top">
+            <label class="uk-margin-remove">
+              <input class="uk-checkbox filter-group" type="checkbox" data-target="teams"> Teams
+            </label>
+            <a href="#" class="toggle-sublist" aria-label="Toggle section">+</a>
+          </div>
+          <ul id="teams-menu" class="uk-nav-sub uk-list uk-margin-small-left" hidden></ul>
+        </div>
+      </li>
+
+    </ul>
+
+  </div>
+</div>
 
     <p id="question" class="uk-margin-small-top uk-margin-small-bottom uk-text-center">
       Which player has the highest WAR?

@@ -1,308 +1,88 @@
-import { PlayerDB } from "./playerDB.js";
 
-class WarGame {
-  constructor() {
-    // Choice buttons
-    this.choiceButtons = [0, 1, 2, 3].map((n, i) => {
-      const btn = document.getElementById(`choice-${n}`);
-      btn.addEventListener('click', () => this.handlePlayerChoice(i));
-      return btn;
-    });
+export class PlayerDB {
 
-    // Menu buttons
-    this.timedGameBtn = document.getElementById('timed-game');
-    this.resetGameBtn = document.getElementById('reset-game');
-    this.playButton = document.getElementById('play-button');
-    this.nextButton = document.getElementById('next-button');
-    this.aboutBtn = document.getElementById('about');
-
-    // Score & timer display
-    this.scoreEl = document.getElementById('score');
-    this.timerDiv = document.getElementById('game-time');
-    this.finalScore = document.getElementById('final-score');
-
-    // Result modal
-    this.resultModal = document.getElementById('result-modal');
-    this.resultTitle = document.getElementById('result-title');
-    this.resultDetail = document.getElementById('result-detail');
-
-    // Modals
-    this.readyModal = UIkit.modal('#ready-modal');
-    this.scoreModal = UIkit.modal('#score-modal');
-    this.aboutModal = UIkit.modal('#about-modal');
-    this.offcanvasNav = UIkit.offcanvas('#offcanvas-nav');
-
-    // Events
-    this.nextButton.addEventListener('click', () => {
-      this.resultModal.hidden = true;
-      this.nextQuestion();
-    });
-
-    UIkit.util.on('#result-modal', 'hidden', this.nextQuestion.bind(this));
-    this.setupMenu();
-  }
-
-  setupMenu() {
-    this.timedGameBtn.addEventListener('click', e => {
-      e.preventDefault();
-      this.prepareTimedGame();
-    });
-
-    this.resetGameBtn.addEventListener('click', e => {
-      e.preventDefault();
-      this.offcanvasNav.hide();
-      this.startRound();
-    });
-
-    this.playButton.addEventListener('click', e => {
-      e.preventDefault();
-      this.offcanvasNav.hide();
-      this.startTimedGame();
-    });
-
-    this.aboutBtn.addEventListener('click', e => {
-      e.preventDefault();
-      this.offcanvasNav.hide();
-      this.aboutModal.show(); // now 'this' is the WarGame instance
-    });
-
-    const statsMenu = document.getElementById('stats-menu');
-    for (let stat of PlayerDB.stats()) {
-      statsMenu.innerHTML += `<li><label><input class="uk-checkbox stats" type="checkbox" value="${stat.key}">  ${stat.label}</label></li>\n`
-    }
-
-    const positionsMenu = document.getElementById('positions-menu');
-    for (let position of PlayerDB.positions()) {
-      positionsMenu.innerHTML += `<li><label><input class="uk-checkbox positions" type="checkbox" value="${position.key}">  ${position.label}</label></li>\n`
-    }
-
-    const teamsMenu = document.getElementById('teams-menu');
-    for (let team of PlayerDB.teams()) {
-      teamsMenu.innerHTML += `<li><label><input class="uk-checkbox teams" type="checkbox" value="${team.key}">  ${team.shortLabel}</label></li>\n`
-    }
-
-    // Toggle expand/collapse
-    document.querySelectorAll('.toggle-sublist').forEach(toggle => {
-      toggle.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const sublist = toggle.closest('.uk-flex').nextElementSibling;
-        if (sublist) {
-          sublist.hidden = !sublist.hidden;
-          toggle.textContent = sublist.hidden ? '+' : '–';
-        }
-      });
-    });
-
-    // Handle parent checkbox -> child checkboxes
-    document.querySelectorAll('.filter-group').forEach(parent => {
-      const group = parent.dataset.target;
-      const children = document.querySelectorAll(`.${group}`);
-
-      parent.addEventListener('change', () => {
-        children.forEach(child => child.checked = parent.checked);
-      });
-
-      // Update parent checkbox if any child is manually unchecked
-      children.forEach(child => {
-        child.addEventListener('change', () => {
-          const allChecked = Array.from(children).every(c => c.checked);
-          parent.checked = allChecked;
-        });
-      });
-    });
-
-    // user selection
-    document.querySelectorAll('input.teams, input.positions, input.stats').forEach(input => {
-      input.addEventListener('change', e => this.handleFilterSelect(e));
-    });
-
-    document.querySelectorAll('input.filter-group').forEach(groupCheckbox => {
-      groupCheckbox.addEventListener('change', e => this.handleFilterSelect(e));
+  static filteredPlayers(selectedTeams = [], selectedPositions = []) {
+    return this.players().filter(player => {
+      const matchTeam = selectedTeams.length === 0 || selectedTeams.includes(player.team);
+      const matchPos = selectedPositions.length === 0 || selectedPositions.includes(player.pos);
+      return matchTeam && matchPos;
     });
   }
 
-  // pass 'teams', 'positions' or 'stats' to get a list of selections
-  getSelection(className) {
-    return Array.from(document.querySelectorAll(`input.${className}:checked`))
-      .map(el => el.value);
+  static teams() {
+    const teams = [
+      { key: 'NYY', label: 'New York Yankees', shortLabel: 'Yankees' },
+      { key: 'CHC', label: 'Chicago Cubs', shortLabel: 'Cubs' },
+      { key: 'SEA', label: 'Seattle Mariners', shortLabel: 'Mariners' },
+      { key: 'HOU', label: 'Houston Astros', shortLabel: 'Astros' },
+      { key: 'WSH', label: 'Washington Nationals', shortLabel: 'Nationals' },
+      { key: 'KC', label: 'Kansas City Royals', shortLabel: 'Royals' },
+      { key: 'SD', label: 'San Diego Padres', shortLabel: 'Padres' },
+      { key: 'MIN', label: 'Minnesota Twins', shortLabel: 'Twins' },
+      { key: 'LAD', label: 'Los Angeles Dodgers', shortLabel: 'Dodgers' },
+      { key: 'BOS', label: 'Boston Red Sox', shortLabel: 'Red Sox' },
+      { key: 'NYM', label: 'New York Mets', shortLabel: 'Mets' },
+      { key: 'CLE', label: 'Cleveland Guardians', shortLabel: 'Guardians' },
+      { key: 'ATL', label: 'Atlanta Braves', shortLabel: 'Braves' },
+      { key: 'CIN', label: 'Cincinnati Reds', shortLabel: 'Reds' },
+      { key: 'TEX', label: 'Texas Rangers', shortLabel: 'Rangers' },
+      { key: 'ARI', label: 'Arizona Diamondbacks', shortLabel: 'Diamondbacks' },
+      { key: 'LAA', label: 'Los Angeles Angels', shortLabel: 'Angels' },
+      { key: 'PHI', label: 'Philadelphia Phillies', shortLabel: 'Phillies' },
+      { key: 'SF', label: 'San Francisco Giants', shortLabel: 'Giants' },
+      { key: 'MIA', label: 'Miami Marlins', shortLabel: 'Marlins' },
+      { key: 'MIL', label: 'Milwaukee Brewers', shortLabel: 'Brewers' },
+      { key: 'TB', label: 'Tampa Bay Rays', shortLabel: 'Rays' },
+      { key: 'TOR', label: 'Toronto Blue Jays', shortLabel: 'Blue Jays' },
+      { key: 'BAL', label: 'Baltimore Orioles', shortLabel: 'Orioles' },
+      { key: 'DET', label: 'Detroit Tigers', shortLabel: 'Tigers' },
+      { key: 'STL', label: 'St. Louis Cardinals', shortLabel: 'Cardinals' },
+      { key: 'ATH', label: 'Oakland Athletics', shortLabel: 'Athletics' },
+      { key: 'COL', label: 'Colorado Rockies', shortLabel: 'Rockies' },
+      { key: 'PIT', label: 'Pittsburgh Pirates', shortLabel: 'Pirates' },
+      { key: 'CHW', label: 'Chicago White Sox', shortLabel: 'White Sox' }
+    ];
+    return teams;
   }
 
-  handleFilterSelect(e) {
-    const selectedTeams = this.getSelection('teams');
-    const selectedPositions = this.getSelection('positions');
-    const allPlayers = PlayerDB.filteredPlayers(selectedTeams, selectedPositions);
-    console.log(`selected ${allPlayers.length}`);
-    this.startRound();
+  static positions() {
+    const positions = [
+      { key: 'RF', label: 'Right Field' },
+      { key: 'CF', label: 'Center Field' },
+      { key: 'C', label: 'Catcher' },
+      { key: 'SS', label: 'Shortstop' },
+      { key: 'LF', label: 'Left Field' },
+      { key: 'SP', label: 'Starting Pitcher' },
+      { key: '2B', label: 'Second Base' },
+      { key: '3B', label: 'Third Base' },
+      { key: '1B', label: 'First Base' },
+      { key: 'DH', label: 'Designated Hitter' }
+    ];
+    return positions;
   }
 
-  startRound() {
-    this.timerDiv.hidden = true;
-    this.count = 0;
-    this.score = 0;
-    this.bestWAR = null;
-    this.updateScore();
-    this.clearSelection();
-    if (this.timerID) {
-      clearInterval(this.timerID);
-    }
-    this.nextQuestion();
-  }
-
-  nextQuestion() {
-    this.setCurrentPlayers();
-    this.clearSelection();
-    for (let i = 0; i < 4; i++) {
-      const btn = this.choiceButtons[i];
-      btn.textContent = i < this.currentPlayers.length ? this.currentPlayers[i].name : '';
-    }
-  }
-
-  clearSelection() {
-    for (let i = 0; i < 4; i++) {
-      this.choiceButtons[i].classList.remove('choice-selected');
-    }
-  }
-
-  updateScore() {
-    this.scoreEl.textContent = `Score: ${this.score} / ${this.count}`;
-  }
-
-  setCurrentPlayers(maxWarDelta = 1.5) {
-    const selectedTeams = this.getSelection('teams');
-    const selectedPositions = this.getSelection('positions');
-    const allPlayers = PlayerDB.filteredPlayers(selectedTeams, selectedPositions);
-
-    //const allPlayers = WarGame.players();
-    WarGame.shuffle(allPlayers);
-
-    const firstPlayer = allPlayers[0];
-    this.bestWAR = firstPlayer.war;
-    const currentPlayers = [firstPlayer];
-    const maxCount = Math.min(4, allPlayers.length)
-
-    for (let index = 1; currentPlayers.length < maxCount; index++) {
-      const player = allPlayers[index];
-      const warDelta = Math.abs(player.war - firstPlayer.war);
-      if (warDelta <= maxWarDelta) {
-        currentPlayers.push(player);
-        if (player.war > this.bestWAR) {
-          this.bestWAR = player.war;
-        }
-      }
-    }
-    this.currentPlayers = currentPlayers;
-  }
-
-  handlePlayerChoice(index) {
-    this.count++;
-    const correctPlayers = this.currentPlayers.filter(p => p.war === this.bestWAR);
-    const correctPlayerNames = correctPlayers.map(p => p.name);
-
-    let namePhrase, conj;
-    if (correctPlayerNames.length === 1) {
-      namePhrase = correctPlayerNames[0];
-      conj = 'has';
-    } else if (correctPlayerNames.length === 2) {
-      namePhrase = `${correctPlayerNames[0]} and ${correctPlayerNames[1]}`;
-      conj = 'both have';
-    } else {
-      namePhrase = `${correctPlayerNames.slice(0, -1).join(', ')}, and ${correctPlayerNames.slice(-1)}`;
-      conj = 'all have';
-    }
-
-    const correctPhrase = `${namePhrase} ${conj} the top WAR (${this.bestWAR.toFixed(1)})`;
-    const isCorrect = index < this.currentPlayers.length ? this.currentPlayers[index].war === this.bestWAR : false;
-
-    if (isCorrect) this.score++;
-
-    this.showResult({
-      correct: isCorrect,
-      phrase: correctPhrase,
-      index: index,
-    });
-  }
-
-  showResult({ correct, phrase, index }) {
-    const title = correct ? "Correct" : "Nope";
-    this.resultTitle.innerHTML = `<strong>${title}</strong>`;
-    this.resultDetail.textContent = correct ? `Yes, ${phrase}` : phrase;
-
-    this.updateScore();
-
-    for (let i = 0; i < 4; i++) {
-      const btn = this.choiceButtons[i];
-      const player = i < this.currentPlayers.length ? this.currentPlayers[i] : null;
-      btn.classList.toggle('choice-selected', i === index);
-      btn.textContent = player ? `${player.name} (${player.war})` : '';
-    }
-    this.resultModal.hidden = false;
-  }
-
-  prepareTimedGame() {
-    setTimeout(() => {
-      this.readyModal.show();
-    }, 10); // wait for offcanvas to finish closing
-  }
-
-  startTimedGame(seconds = 60) {
-    this.readyModal.hide();
-    this.startRound();
-    this.timerDiv.hidden = false;
-
-    const updateTimerDisplay = sec => {
-      const mins = Math.floor(sec / 60).toString().padStart(2, '0');
-      const secs = (sec % 60).toString().padStart(2, '0');
-      this.timerDiv.textContent = `${mins}:${secs}`;
-    };
-    updateTimerDisplay(seconds);
-
-    if (this.timerID) clearInterval(this.timerID);
-    this.timerID = setInterval(() => {
-      seconds--;
-      updateTimerDisplay(seconds);
-
-      if (seconds <= 0) {
-        clearInterval(this.timerID);
-        this.timedGameOver();
-      }
-    }, 1000);
-  }
-
-  timedGameOver() {
-    this.finalScore.textContent = `${this.scoreEl.textContent}`;
-    this.scoreModal.show();
-    this.resultModal.hidden = true;
-    this.startRound();
-  }
-
-  static shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
+  static stats() {
+    const stats = [
+      { key: 'gp', label: 'Games Played' },
+      { key: 'ab', label: 'At Bats' },
+      { key: 'r', label: 'Runs' },
+      { key: 'h', label: 'Hits' },
+      { key: 'avg', label: 'Batting Average' },
+      { key: 'hr', label: 'Home Runs' },
+      { key: 'rbi', label: 'Runs Batted In' },
+      { key: 'tb', label: 'Total Bases' },
+      { key: 'bb', label: 'Walks' },
+      { key: 'k', label: 'Strikeouts' },
+      { key: 'sb', label: 'Stolen Bases' },
+      { key: 'obp', label: 'On-Base Percentage' },
+      { key: 'slg', label: 'Slugging Percentage' },
+      { key: 'ops', label: 'On-base Plus Slugging' },
+      { key: 'war', label: 'Wins Above Replacement' }
+    ];
+    return stats;
   }
 
   static players() {
-    const pos = [
-      "C",   // Catcher
-      "1B",  // First Base
-      "2B",  // Second Base
-      "3B",  // Third Base
-      "SS",  // Shortstop
-      "LF",  // Left Field
-      "CF",  // Center Field
-      "RF",  // Right Field
-      "OF",  // Outfield (general, used for aggregated stats)
-      "DH",  // Designated Hitter
-      "P",   // Pitcher
-      "SP",  // Starting Pitcher
-      "RP",  // Relief Pitcher
-      "2-W", // Two-way player (rare, used for players like Shohei Ohtani)
-      "UT",  // Utility (general use, not always official)
-    ]
-
     return [
       { "name": "Aaron Judge", "team": "NYY", "pos": "RF", "gp": 100, "ab": 367, "r": 89, "h": 128, "avg": 0.349, "2b": 24, "3b": 2, "hr": 36, "rbi": 82, "tb": 264, "bb": 72, "k": 117, "sb": 6, "obp": 0.456, "slg": 0.719, "ops": 1.176, "war": 6.9 },
       { "name": "Pete Crow-Armstrong", "team": "CHC", "pos": "CF", "gp": 98, "ab": 385, "r": 68, "h": 104, "avg": 0.27, "2b": 24, "3b": 4, "hr": 26, "rbi": 72, "tb": 214, "bb": 18, "k": 96, "sb": 28, "obp": 0.306, "slg": 0.556, "ops": 0.861, "war": 5.7 },
@@ -606,8 +386,5 @@ class WarGame {
       { "name": "Luke Maile", "team": "KC", "pos": "C", "gp": 6, "ab": 8, "r": 2, "h": 3, "avg": 0.375, "2b": 0, "3b": 0, "hr": 1, "rbi": 1, "tb": 6, "bb": 2, "k": 1, "sb": 0, "obp": 0.5, "slg": 0.75, "ops": 1.25, "war": 0.2 },
     ];
   }
-
 }
 
-const warGame = new WarGame();
-warGame.startRound();
