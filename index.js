@@ -1,4 +1,5 @@
 import { PlayerDB } from "./playerDB.js";
+import { Question } from "./quiz.js";
 
 class WarGame {
   constructor() {
@@ -148,7 +149,7 @@ class WarGame {
     this.timerDiv.hidden = true;
     this.count = 0;
     this.score = 0;
-    this.bestStat = 0;
+
     this.updateScore();
     this.clearSelection();
     if (this.timerID) {
@@ -160,18 +161,14 @@ class WarGame {
   nextQuestion() {
     const stats = this.getSelection('stats');
     const randomStat = (stats[Math.floor(Math.random() * stats.length)]);
-    this.currentStat = randomStat.key;
-    this.currentStatLabel = randomStat.label;
-
-    this.currentPlayers = this.playerDB.selectFour(this.currentStat, 0.5);
-    this.bestStat = Math.max(...this.currentPlayers.map(p => p[this.currentStat]));
+    this.question = new Question(this.playerDB, randomStat);
 
     this.clearSelection();
     for (let i = 0; i < 4; i++) {
       const btn = this.choiceButtons[i];
-      btn.textContent = i < this.currentPlayers.length ? this.currentPlayers[i].name : '';
+      btn.textContent = this.question.playerName(i);
     }
-    this.questionLabel.innerText = `${this.currentStatLabel}`;
+    this.questionLabel.innerText = `${randomStat.label}`;
   }
 
   clearSelection() {
@@ -184,48 +181,21 @@ class WarGame {
     this.scoreEl.textContent = `Score: ${this.score} / ${this.count}`;
   }
 
-
   handlePlayerChoice(index) {
     this.count++;
-    const correctPlayers = this.currentPlayers.filter(p => p[this.currentStat] === this.bestStat);
-    const correctPlayerNames = correctPlayers.map(p => p.name);
-
-    let namePhrase, conj;
-    if (correctPlayerNames.length === 1) {
-      namePhrase = correctPlayerNames[0];
-      conj = 'has';
-    } else if (correctPlayerNames.length === 2) {
-      namePhrase = `${correctPlayerNames[0]} and ${correctPlayerNames[1]}`;
-      conj = 'both have';
-    } else {
-      namePhrase = `${correctPlayerNames.slice(0, -1).join(', ')}, and ${correctPlayerNames.slice(-1)}`;
-      conj = 'all have';
-    }
-
-    const correctPhrase = `${namePhrase} ${conj} the top ${this.currentStatLabel} (${this.bestStat.toFixed(1)})`;
-    const isCorrect = index < this.currentPlayers.length ? this.currentPlayers[index][this.currentStat] === this.bestStat : false;
-
+    const isCorrect = this.question.isWinningIndex(index);
     if (isCorrect) this.score++;
-
-    this.showResult({
-      correct: isCorrect,
-      phrase: correctPhrase,
-      index: index,
-    });
-  }
-
-  showResult({ correct, phrase, index }) {
-    const title = correct ? "Correct" : "Nope";
-    this.resultTitle.innerHTML = `<strong>${title}</strong>`;
-    this.resultDetail.textContent = correct ? `Yes, ${phrase}` : phrase;
-
     this.updateScore();
+
+    const correctPhrase = this.question.answerString();
+    const title = isCorrect ? "Correct" : "Nope";
+    this.resultTitle.innerHTML = `<strong>${title}</strong>`;
+    this.resultDetail.textContent = isCorrect ? `Yes, ${correctPhrase}` : correctPhrase;
 
     for (let i = 0; i < 4; i++) {
       const btn = this.choiceButtons[i];
-      const player = i < this.currentPlayers.length ? this.currentPlayers[i] : null;
       btn.classList.toggle('choice-selected', i === index);
-      btn.textContent = player ? `${player.name} (${player[this.currentStat]})` : '';
+      btn.textContent = this.question.playerName(i, true);
     }
     this.resultModal.hidden = false;
   }

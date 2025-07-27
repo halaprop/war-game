@@ -139,21 +139,21 @@ export class PlayerDB {
 
   static stats() {
     const stats = [
-      { key: 'gp', label: 'Games Played' },
-      { key: 'ab', label: 'At Bats' },
-      { key: 'r', label: 'Runs' },
-      { key: 'h', label: 'Hits' },
-      { key: 'avg', label: 'Batting Average' },
-      { key: 'hr', label: 'Home Runs' },
-      { key: 'rbi', label: 'Runs Batted In' },
-      { key: 'tb', label: 'Total Bases' },
-      { key: 'bb', label: 'Walks' },
-      { key: 'k', label: 'Strikeouts' },
-      { key: 'sb', label: 'Stolen Bases' },
-      { key: 'obp', label: 'On-Base Percentage' },
-      { key: 'slg', label: 'Slugging Percentage' },
-      { key: 'ops', label: 'On-base Plus Slugging' },
-      { key: 'war', label: 'Wins Above Replacement' }
+      { key: 'gp', label: 'Games Played', superlative: 'most' },
+      { key: 'ab', label: 'At Bats', superlative: 'most' },
+      { key: 'r', label: 'Runs', superlative: 'most' },
+      { key: 'h', label: 'Hits', superlative: 'most' },
+      { key: 'avg', label: 'Batting Average', superlative: 'highest' },
+      { key: 'hr', label: 'Home Runs', superlative: 'most' },
+      { key: 'rbi', label: 'Runs Batted In', superlative: 'most' },
+      { key: 'tb', label: 'Total Bases', superlative: 'most' },
+      { key: 'bb', label: 'Walks', superlative: 'most' },
+      { key: 'k', label: 'Strikeouts', superlative: 'fewest' },
+      { key: 'sb', label: 'Stolen Bases', superlative: 'most' },
+      { key: 'obp', label: 'On-Base Percentage', superlative: 'highest' },
+      { key: 'slg', label: 'Slugging Percentage', superlative: 'highest' },
+      { key: 'ops', label: 'On-base Plus Slugging', superlative: 'highest' },
+      { key: 'war', label: 'Wins Above Replacement', superlative: 'highest' }
     ];
     return stats;
   }
