@@ -2,6 +2,7 @@ import { PlayerDB } from "./playerDB.js";
 
 class WarGame {
   constructor() {
+    this.playerDB = new PlayerDB();
     // Choice buttons
     this.choiceButtons = [0, 1, 2, 3].map((n, i) => {
       const btn = document.getElementById(`choice-${n}`);
@@ -138,10 +139,8 @@ class WarGame {
   }
 
   handleFilterSelect(e) {
-    const selectedTeams = this.selectedKeys('teams');
-    const selectedPositions = this.selectedKeys('positions');
-    const allPlayers = PlayerDB.filteredPlayers(selectedTeams, selectedPositions);
-    console.log(`selected ${allPlayers.length}`);
+    this.playerDB.selectedTeams = this.selectedKeys('teams');
+    this.playerDB.selectedPositions = this.selectedKeys('positions');
     this.startRound();
   }
 
@@ -163,7 +162,10 @@ class WarGame {
     const randomStat = (stats[Math.floor(Math.random() * stats.length)]);
     this.currentStat = randomStat.key;
     this.currentStatLabel = randomStat.label;
-    this.setCurrentPlayers();
+
+    this.currentPlayers = this.playerDB.selectFour(this.currentStat, 0.5);
+    this.bestStat = Math.max(...this.currentPlayers.map(p => p[this.currentStat]));
+
     this.clearSelection();
     for (let i = 0; i < 4; i++) {
       const btn = this.choiceButtons[i];
@@ -182,30 +184,6 @@ class WarGame {
     this.scoreEl.textContent = `Score: ${this.score} / ${this.count}`;
   }
 
-  setCurrentPlayers(maxStdDevDelta = 1) {
-    const selectedTeams = this.selectedKeys('teams');
-    const selectedPositions = this.selectedKeys('positions');
-    const players = PlayerDB.filteredPlayers(selectedTeams, selectedPositions, true);
-    const { mean, stdDev } = PlayerDB.meanStdDev(players, this.currentStat);
-
-    const firstPlayer = players[0];
-    this.bestStat = firstPlayer[this.currentStat];
-    const currentPlayers = [firstPlayer];
-    const maxCount = Math.min(4, players.length)
-
-    for (let index = 1; currentPlayers.length < maxCount && index < players.length; index++) {
-      const player = players[index];
-      const stDevDelta = Math.abs(player[this.currentStat] - firstPlayer[this.currentStat]);
-      if (stDevDelta <= stdDev * maxStdDevDelta || currentPlayers.length < 2) {
-        // Always add at least one more player
-        currentPlayers.push(player);
-        if (player[this.currentStat] > this.bestStat) {
-          this.bestStat = player[this.currentStat];
-        }
-      }
-    }
-    this.currentPlayers = currentPlayers;
-  }
 
   handlePlayerChoice(index) {
     this.count++;
