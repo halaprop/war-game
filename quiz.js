@@ -1,9 +1,9 @@
 import { PlayerDB } from "./playerDB.js";
 
 export class Question {
-  constructor(stat, teams = [], positions = [], maxDev = 1.0) {
+  constructor(stat, teams = [], positions = [], maxDev = 0.3) {
     this.stat = stat;
-    this.maximize = this.stat !== 'k';
+    this.maximize = this.stat.key !== 'k';
     this.players = this.selectFourPlayers(this.stat.key, teams, positions, maxDev);
   }
 

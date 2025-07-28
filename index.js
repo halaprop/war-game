@@ -40,6 +40,14 @@ class WarGame {
       this.nextQuestion();
     });
 
+    // clicking off the result modal is equivalent to clicking next?
+    // this.resultModal.addEventListener('click', (event) => {
+    //   const modalCard = document.querySelector('.result-card');
+    //   if (!modalCard.contains(event.target)) {
+    //     this.nextButton.click();
+    //   }
+    // });
+
     UIkit.util.on('#result-modal', 'hidden', this.nextQuestion.bind(this));
     this.setupMenu();
   }
