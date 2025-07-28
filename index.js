@@ -167,7 +167,9 @@ class WarGame {
       const btn = this.choiceButtons[i];
       btn.textContent = this.question.playerName(i);
     }
-    this.questionLabel.innerText = `${randomStat.label}`;
+    const superlative  = randomStat.superlative;
+    const capSuperlative = superlative[0].toUpperCase() + superlative.slice(1);
+    this.questionLabel.innerText = `${capSuperlative} ${randomStat.label}`;
   }
 
   clearSelection() {
@@ -186,10 +188,9 @@ class WarGame {
     if (isCorrect) this.score++;
     this.updateScore();
 
-    const correctPhrase = this.question.answerString();
     const title = isCorrect ? "Correct" : "Nope";
     this.resultTitle.innerHTML = `<strong>${title}</strong>`;
-    this.resultDetail.textContent = isCorrect ? `Yes, ${correctPhrase}` : correctPhrase;
+    this.resultDetail.textContent = this.question.answerString();;
 
     for (let i = 0; i < 4; i++) {
       const btn = this.choiceButtons[i];

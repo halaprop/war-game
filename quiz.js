@@ -90,7 +90,7 @@ export class Question {
       namePhrase = `${winningPlayerNames.slice(0, -1).join(', ')}, and ${winningPlayerNames.slice(-1)}`;
       conj = 'all have';
     }
-    const result = `${namePhrase} ${conj} ${this.stat.superlative} ${this.stat.label} (${this.winningValue(1)})`;
+    const result = `${namePhrase} ${conj} the ${this.stat.superlative} ${this.stat.label.toLowerCase()} (${this.winningValue(1)})`;
     return result;
   }
 
