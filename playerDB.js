@@ -1,61 +1,8 @@
 
 export class PlayerDB {
-  constructor() {
-    this.selectedTeams = [];
-    this.selectedPositions = [];
-    this.selectedStats = [];
-  }
 
-  playerMatches(player) {
-    const teamMatch = this.selectedTeams.length === 0 || this.selectedTeams.includes(player.team);
-    const positionMatch = this.selectedPositions.length === 0 || this.selectedPositions.includes(player.pos);
-    return teamMatch && positionMatch;
-  }
-
-  matchingPlayers(shuffled = true) {
-    const matches = PlayerDB.players().filter(p => this.playerMatches(p));
-    return shuffled ? PlayerDB.shuffle(matches) : matches;
-  }
-
-  // This returns up to four players from those matching the current filters.
-  // Tries to find a group whose `statKey` values have a standard deviation
-  // between `minDev` and `maxDev`. Always returns the best group found.
-  //
-  selectFour(statKey, maxDev = 1.0) {
-    const players = this.matchingPlayers(false);
-    if (players.length <= 4) return players;
-
-    const populationDeviation = PlayerDB.stdDevForStat(statKey);
-    const maxDeviation = maxDev * populationDeviation;
-
-    let bestFour = null;
-    let lowestDeviation = Infinity;
-
-    for (let i = 0; i < 100; i++) {
-      const candidateFour = PlayerDB.randomFour(players);
-      const values = candidateFour.map(p => p[statKey]);
-      const stdDeviation = PlayerDB.stdDeviation(values);
-
-      if (stdDeviation <= maxDeviation) {
-        bestFour = candidateFour;
-        break;
-      }
-
-      if (stdDeviation < lowestDeviation) {
-        lowestDeviation = stdDeviation;
-        bestFour = candidateFour;
-      }
-    }
-    return bestFour;
-  }
-
-  static randomFour(array) {
-    const result = array.slice();
-    for (let i = result.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result.slice(0, 4);
+  static randomFourPlayers() {
+    return this.shuffle(this.players().slice()).slice(0, 4);
   }
 
   static stdDevForStat(statKey) {
@@ -83,6 +30,7 @@ export class PlayerDB {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
   }
 
   static teams() {

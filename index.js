@@ -3,7 +3,6 @@ import { Question } from "./quiz.js";
 
 class WarGame {
   constructor() {
-    this.playerDB = new PlayerDB();
     // Choice buttons
     this.choiceButtons = [0, 1, 2, 3].map((n, i) => {
       const btn = document.getElementById(`choice-${n}`);
@@ -140,8 +139,8 @@ class WarGame {
   }
 
   handleFilterSelect(e) {
-    this.playerDB.selectedTeams = this.selectedKeys('teams');
-    this.playerDB.selectedPositions = this.selectedKeys('positions');
+    this.selectedTeams = this.selectedKeys('teams');
+    this.selectedPositions = this.selectedKeys('positions');
     this.startRound();
   }
 
@@ -161,7 +160,7 @@ class WarGame {
   nextQuestion() {
     const stats = this.getSelection('stats');
     const randomStat = (stats[Math.floor(Math.random() * stats.length)]);
-    this.question = new Question(this.playerDB, randomStat);
+    this.question = new Question(randomStat, this.selectedTeams, this.selectedPositions);
 
     this.clearSelection();
     for (let i = 0; i < 4; i++) {

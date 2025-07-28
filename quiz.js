@@ -1,12 +1,49 @@
 import { PlayerDB } from "./playerDB.js";
 
 export class Question {
-  constructor(playerDB, stat, maxDev = 1.0) {
-    this.playerDB = playerDB;
+  constructor(stat, teams = [], positions = [], maxDev = 1.0) {
     this.stat = stat;
     this.maximize = this.stat !== 'k';
-    this.players = this.playerDB.selectFour(this.stat.key, maxDev);
+    this.players = this.selectFourPlayers(this.stat.key, teams, positions, maxDev);
   }
+
+  // returns up to four players from those matching the current filters.
+  // Tries to find a group whose `statKey` values have a standard deviation
+  // between `minDev` and `maxDev`. Always returns the best group found.
+  //
+  selectFourPlayers(statKey, teams, positions, maxDev) {
+    const players = PlayerDB.players().filter(p => {
+      const teamMatch = teams.length === 0 || teams.includes(p.team);
+      const positionMatch = positions.length === 0 || positions.includes(p.pos);
+      return teamMatch && positionMatch;
+    });
+
+    if (players.length <= 4) return players;
+
+    const populationDeviation = PlayerDB.stdDevForStat(statKey);
+    const maxDeviation = maxDev * populationDeviation;
+
+    let bestFour = null;
+    let lowestDeviation = Infinity;
+
+    for (let i = 0; i < 100; i++) {
+      const candidateFour = PlayerDB.randomFourPlayers();
+      const values = candidateFour.map(p => p[statKey]);
+      const stdDeviation = PlayerDB.stdDeviation(values);
+
+      if (stdDeviation <= maxDeviation) {
+        bestFour = candidateFour;
+        break;
+      }
+
+      if (stdDeviation < lowestDeviation) {
+        lowestDeviation = stdDeviation;
+        bestFour = candidateFour;
+      }
+    }
+    return bestFour;
+  }
+
 
   statName() {
     return this.stat.label;
